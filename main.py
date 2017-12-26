@@ -94,12 +94,12 @@ note_params = {
     "duration": 0.2,
     "amplitude": 0.1,
     "attack": 0.1,
-    "decay"=0.02,
-    "sustain"=1,
-    "release"=0.08
-    "envelope"=
+    "decay": 0.02,
+    "sustain": 1,
+    "release": 0.08,
+    "envelope": EnvExponential
 }
-notes = [Sine(freq, start=0.0, duration=.2, amplitude=.1, attack=0.1, decay=0.02, sustain=1, release=0.08) for freq in [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]]
+notes = [Sine({**note_params, **{"frequency": freq}}) for freq in [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]]
 
 for _ in range(1):
     n = randint(0, len(notes) - 1)
