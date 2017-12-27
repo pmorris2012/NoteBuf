@@ -1,3 +1,7 @@
+class UnsetOptParam(Exception):
+    pass
+
+
 class _Param():
     param_list = []
     opt_param_list = []
@@ -20,4 +24,6 @@ class _Param():
             assert p in params
 
     def _set_opt_param_vals(self, params):
-        pass
+        for param in self.opt_param_list:
+            if param not in vars(self):
+                raise UnsetOptParam()
