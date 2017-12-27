@@ -3,6 +3,7 @@ import numpy as np
 from random import randint
 import math
 
+from param import _Param
 from oscillator import OscSine
 from envelope import EnvLinear, EnvExpontial
 
@@ -13,8 +14,6 @@ volume = 0.5     # range [0.0, 1.0]
 fs = 44100       # sampling rate, Hz, must be integer
 duration = 1.0   # in seconds, may be float
 f = 220.0        # sine frequency, Hz, may be float
-
-_sentinel = object()
 
 def env_exp(x, b, a0, a1, t0, t1):
     assert b > 0 and b <= 1
@@ -35,16 +34,29 @@ def env_exp(x, b, a0, a1, t0, t1):
 
     return (a0 - a1) * np.power(1 - (x - t0) / (t1 - t0), 1 / b) + a1
 
-class Note():
-    def __init__(self, start=0.0, duration=1.0, amplitude=1.0, attack=0.0, decay=0.0, sustain=_sentinel, release=0.0):
-        assert attack + decay + release < duration or math.isclose(attack + decay + release, duration)
+class Note(_Param):
+    param_list = ["start", "duration", "amplitude"]
+    opt_param_list = ["attack", "decay", "sustain", "release", "envelope"]
 
-        if sustain == _sentinel:
-            sustain = amplitude
+    def __init__(self, params):
+        super().__init__(params)
 
-        vars(self).update((k,v) for k,v in vars().items() if k != 'self' and k not in vars(self))
+        assert self.attack + self.decay + self.release < self.duration or math.isclose(self.attack + self.decay + self.release, self.duration)
+        
         self.buff = np.arange(int(fs*duration)).astype(np.float32)
         self.env = np.empty(int(fs*duration)).astype(np.float32)
+
+    def _set_opt_param_vals(self, params):
+        if not "attack" in params:
+            self.attack = 0.1 * params["duration"]
+        if not "decay" in params:
+            self.decay = 0.1 * params["duration"]
+        if not "sustain" in params:
+            self.sustain = params["amplitude"]
+        if not "release" in params:
+            self.release = 0.1 * params["duration"]
+        if not "envelope" in params:
+            self.envelope = EnvExponential
 
     def envelope(self):
         a = int(self.attack*fs)
@@ -75,8 +87,8 @@ class Note():
         
 
 class Sine(Note):
-    def __init__(self, frequency, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    def __init__(self, params):
+        super().__init__(params)
         self.buff = np.sin(2*np.pi*self.buff*frequency/fs)
         self.envelope_exp()
 
