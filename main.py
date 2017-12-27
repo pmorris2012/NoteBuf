@@ -25,7 +25,8 @@ note_params = {
     "decay": 0.02,
     "sustain": 0.4,
     "release": 0.08,
-    "sample_rate": 44100
+    "sample_rate": 44100,
+    "exp_factor": .623
 }
 
 env = EnvExponential(note_params)

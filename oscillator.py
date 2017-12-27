@@ -4,9 +4,8 @@ from param import _Param
 
 
 class _Oscillator(_Param):
-    param_list = ["start", "duration", "amplitude", "frequency", "sample_rate"]
-
     def __init__(self, params):
+        self.param_list.extend(["start", "duration", "amplitude", "frequency", "sample_rate"])
         super().__init__(params)
         self.buff = np.arange(int(self.sample_rate * self.duration)).astype(np.float32)
         

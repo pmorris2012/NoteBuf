@@ -20,5 +20,4 @@ class _Param():
             assert p in params
 
     def _set_opt_param_vals(self, params):
-        if len(self.opt_param_list) > 0:
-            raise NotImplmementedError
+        pass
