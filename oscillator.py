@@ -19,3 +19,13 @@ class OscSquare(OscSine):
     def __init__(self, params):
         super().__init__(params)
         self.buff = np.sign(self.buff)
+
+class OscSawtooth(_Oscillator):
+    def __init__(self, params):
+        super().__init__(params)
+        self.buff = np.mod(1 + 2 * self.buff * self.frequency / self.sample_rate, 2) - 1
+
+class OscTriangle(_Oscillator):
+    def __init__(self, params):
+        super().__init__(params)
+        self.buff = 2 * np.abs(np.mod(-0.5 + 2 * self.buff * self.frequency / self.sample_rate, 2) -1) - 1
