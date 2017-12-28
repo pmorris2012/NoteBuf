@@ -54,7 +54,7 @@ class EnvExponential(_Envelope, _Param):
         assert self.exp_factor > 0 and self.exp_factor <= 1
         assert a0 >= 0 and a0 <= 1
         assert a1 >= 0 and a1 <= 1
-        assert t0 >= 0 and t1 > 0
+        assert t0 >= 0 and t1 >= 0
 
         return (a0 - a1) * np.power(1 - (x - t0) / (t1 - t0), 1 / self.exp_factor) + a1
 

@@ -14,3 +14,8 @@ class OscSine(_Oscillator):
     def __init__(self, params):
         super().__init__(params)
         self.buff = np.sin(2 * np.pi * self.buff * self.frequency / self.sample_rate)
+
+class OscSquare(OscSine):
+    def __init__(self, params):
+        super().__init__(params)
+        self.buff = np.sign(self.buff)

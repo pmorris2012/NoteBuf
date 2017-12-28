@@ -2,7 +2,7 @@ import pyaudio
 from random import randint
 
 from param import _Param
-from oscillator import OscSine
+from oscillator import OscSine, OscSquare
 from envelope import EnvLinear, EnvExponential
 
 
@@ -30,7 +30,7 @@ note_params = {
 }
 
 env = EnvExponential(note_params)
-notes = [OscSine({**note_params, **{"frequency": freq}}) for freq in [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]]
+notes = [OscSquare({**note_params, **{"frequency": freq}}) for freq in map(lambda x: x*0.5, [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0])]
 for note in notes:
     env.apply(note.buff)
 
