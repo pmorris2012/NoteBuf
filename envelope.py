@@ -6,8 +6,8 @@ from param import _Param
 
 class _Envelope(_Param):
     def __init__(self, params):
-        self.param_list.extend(["duration", "amplitude", "sample_rate"])
-        self.opt_param_list.extend(["attack", "decay", "sustain", "release"])
+        self._setup_param_list(["duration", "amplitude", "sample_rate"])
+        self._setup_opt_param_list(["attack", "decay", "sustain", "release"])
         super().__init__(params)
         assert self.attack + self.decay + self.release < self.duration or math.isclose(self.attack + self.decay + self.release, self.duration)
         
@@ -20,24 +20,24 @@ class _Envelope(_Param):
         self.r = int(self.release * self.sample_rate)
     
     def _set_opt_param_vals(self, params):
-        super()._set_opt_param_vals(params)
-        if not "attack" in params:
+        if not self._is_opt_param_set("attack", params):
             self.attack = 0.1 * params["duration"]
-        if not "decay" in params:
+        if not self._is_opt_param_set("decay", params):
             self.decay = 0.1 * params["duration"]
-        if not "sustain" in params:
+        if not self._is_opt_param_set("sustain", params):
             self.sustain = params["amplitude"]
-        if not "release" in params:
+        if not self._is_opt_param_set("release", params):
             self.release = 0.1 * params["duration"]
+        super()._set_opt_param_vals(params)
 
     def apply(self, buffer):
         assert buffer.size == self.env.size
-        buffer *= self.env
+        return buffer * self.env
 
 
 class EnvExponential(_Envelope, _Param):
     def __init__(self, params):
-        self.opt_param_list.extend(["exp_factor"])
+        self._setup_opt_param_list(["exp_factor"])
         super().__init__(params)
 
         self.env[:self.a] = self._env_exp(np.linspace(0.0, self.attack, self.a), 0.0, self.amplitude, 0.0, self.attack)
@@ -46,9 +46,9 @@ class EnvExponential(_Envelope, _Param):
         self.env[self.s:] = self._env_exp(np.linspace(self.duration - self.release, self.duration, self.r), self.sustain, 0.0, self.duration - self.release, self.duration)
 
     def _set_opt_param_vals(self, params):
-        super()._set_opt_param_vals(params)
-        if not "exp_factor" in params:
+        if not self._is_opt_param_set("exp_factor", params):
             self.exp_factor = 0.326
+        super()._set_opt_param_vals(params)
 
     def _env_exp(self, x, a0, a1, t0, t1):
         assert self.exp_factor > 0 and self.exp_factor <= 1
@@ -60,7 +60,6 @@ class EnvExponential(_Envelope, _Param):
 
 
 class EnvLinear(_Envelope):
-
     def __init__(self, params):
         super().__init__(params)
 
