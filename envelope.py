@@ -47,7 +47,7 @@ class EnvExponential(_Envelope, _Param):
 
     def _set_opt_param_vals(self, params):
         if not self._is_opt_param_set("exp_factor", params):
-            self.exp_factor = 0.326
+            self.exp_factor = 0.623
         super()._set_opt_param_vals(params)
 
     def _env_exp(self, x, a0, a1, t0, t1):
