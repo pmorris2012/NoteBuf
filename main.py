@@ -27,7 +27,8 @@ note_params = {
     "decay": 0.02,
     "sustain": 0.4,
     "release": 0.08,
-    "sample_rate": 44100
+    "sample_rate": 44100,
+    "harmonic_vol_list": [1, .5, 0, 0, .1, 0, 0, 0, 0, 0, .1]
 }
 
 env = EnvExponential(note_params)

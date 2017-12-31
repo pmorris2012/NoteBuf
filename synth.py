@@ -18,7 +18,7 @@ class SynHarmonic(_Param):
             harm_params = params.copy()
             harm_params["frequency"] = freq
             harmonics.append(self.oscillator(harm_params).buff * volume)
-            freq += freq
+            freq += self.frequency
             if freq > self.sample_rate / 2:
                 break
 
