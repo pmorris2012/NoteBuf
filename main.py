@@ -28,11 +28,11 @@ note_params = {
     "sustain": 0.4,
     "release": 0.08,
     "sample_rate": 44100,
-    "harmonic_vol_list": [1, .5, 0, 0, .1, 0, 0, 0, 0, 0, .1]
+    "harmonic_vol_list": [.06, 1, .38, 0, .13, .15, 0, .04, .23, .18, 0, .12]
 }
 
 env = EnvExponential(note_params)
-frequencies = [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]
+frequencies = list(map(lambda x: x/4, [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]))
 waves = [OscSine, OscSquare, OscSawtooth, OscTriangle]
 
 for _ in range(20):
