@@ -2,7 +2,7 @@ import pyaudio
 import random
 
 from param import _Param
-from oscillator import Oscillator
+from oscillator import OscSine, OscSquare, OscSawtooth, OscTriangle
 from synth import SynHarmonic
 from envelope import EnvLinear, EnvExponential
 from mixer import Mixer
@@ -33,12 +33,12 @@ note_params = {
 
 env = EnvExponential(note_params)
 frequencies = list(map(lambda x: x/4, [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]))
-waves = ["sine", "sawtooth", "triangle", "square"]
+waves = [OscSine, OscSquare, OscSawtooth, OscTriangle]
 
 for _ in range(20):
-    note1 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "osc_type": random.choice(waves)}})
-    note2 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "osc_type": random.choice(waves)}})
-    note3 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "osc_type": random.choice(waves)}})
+    note1 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
+    note2 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
+    note3 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
     finalbuff = Mixer(note_params, env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff)).buff
     stream.write(volume*finalbuff, len(finalbuff))
 

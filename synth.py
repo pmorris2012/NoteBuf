@@ -1,13 +1,13 @@
 import numpy as np
 
 from param import _Param
-from oscillator import Oscillator
+from oscillator import *
 from mixer import Mixer
 
 
 class SynHarmonic(_Param):
     def __init__(self, params):
-        self._setup_param_list(["osc_type", "start", "duration", "amplitude", "frequency", "sample_rate"])
+        self._setup_param_list(["start", "duration", "amplitude", "frequency", "sample_rate", "oscillator"])
         self._setup_opt_param_list(["harmonic_vol_list"])
         super().__init__(params)
 
@@ -17,7 +17,7 @@ class SynHarmonic(_Param):
         for volume in self.harmonic_vol_list:
             harm_params = params.copy()
             harm_params["frequency"] = freq
-            harmonics.append(Oscillator(harm_params).buff * volume)
+            harmonics.append(self.oscillator(harm_params).buff * volume)
             freq += self.frequency
             if freq > self.sample_rate / 2:
                 break
