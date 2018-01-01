@@ -22,7 +22,7 @@ stream = p.open(format=pyaudio.paFloat32,
 
 note_params = {
     "start": 0.0,
-    "duration": 0.2,
+    "duration": 2,
     "amplitude": 0.8,
     "attack": 0.01,
     "decay": 0.02,
@@ -33,10 +33,17 @@ note_params = {
 }
 
 env = EnvExponential(note_params)
-frequencies = list(map(lambda x: x/4, [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]))
+frequencies = list(map(lambda x: x, [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]))
 waves = ["sine", "sawtooth", "triangle", "square"]
 
-for _ in range(20):
+params = {**note_params, **{"frequency": random.choice(frequencies) - 10, "osc_type": "sine"}}
+params["frequency_shift"] = 10
+params["slide_start"] = 0.5
+params["slide_duration"] = 0.5
+s = Oscillator(params)
+stream.write(volume*env.apply(s.buff), len(s.buff))
+
+for _ in range(0):
     note1 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "osc_type": random.choice(waves)}})
     note2 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "osc_type": random.choice(waves)}})
     note3 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "osc_type": random.choice(waves)}})
