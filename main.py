@@ -5,6 +5,7 @@ from param import _Param
 from oscillator import OscSine, OscSquare, OscSawtooth, OscTriangle
 from synth import SynHarmonic
 from envelope import EnvLinear, EnvExponential
+from effect import EffPitchSlide
 from mixer import Mixer
 
 
@@ -35,7 +36,9 @@ env = EnvExponential(note_params)
 frequencies = [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]
 waves = [OscSine, OscSquare, OscSawtooth, OscTriangle]
 
-for _ in range(20):
+s = SynHarmonic({**note_params, **{"frequency": EffPitchSlide({**note_params, **{"frequency": random.choice(frequencies)}}).freq, "oscillator": OscSine}})
+
+for _ in range(0):
     note1 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
     note2 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
     note3 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
