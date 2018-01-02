@@ -12,18 +12,24 @@ class _Oscillator(_Param):
         if self.frequency_shift != 0:
             assert self.slide_start + self.slide_duration < self.duration
 
-            freqbuff = np.empty(int(self.sample_rate * self.duration)).astype(np.float32)
+            samples1 = int(self.slide_start * self.sample_rate)
+            samples2 = int(self.slide_duration * self.sample_rate)
+            samples3 = int(self.duration * self.sample_rate) - samples2 - samples1
 
-            start = int(self.slide_start * self.sample_rate)
-            end = int((self.slide_start + self.slide_duration) * self.sample_rate)
+            phase1, k1 = self._gen_phase(samples1, self.frequency, self.frequency)
+            phase2, k2 = self._gen_phase(samples2, self.frequency, self.frequency + self.frequency_shift, k1)
+            phase3, _ = self._gen_phase(samples3, self.frequency + self.frequency_shift, self.frequency + self.frequency_shift, k2)
+            self.phase = np.concatenate((phase1, phase2, phase3))
+        else:
+            self.phase, _ = self._gen_phase(int(self.duration * self.sample_rate), self.frequency, self.frequency)
 
-            freqbuff[:start] = self.frequency
-            freqbuff[start:end] = np.linspace(self.frequency, self.frequency + self.frequency_shift, end - start)
-            freqbuff[end:] = self.frequency + self.frequency_shift
 
-            self.frequency = freqbuff
-
-        self.buff = np.arange(int(self.sample_rate * self.duration)).astype(np.float32)
+    def _gen_phase(self, num_samples, fstart, fend, k=0):
+        buff = np.arange(num_samples).astype(np.float32)
+        buff = buff / num_samples
+        t = num_samples * buff / self.sample_rate
+        phase = t * (fstart + (fend - fstart) * buff / 2) + k
+        return phase, ((phase[-1] % 1 + (phase[-1] - phase[-2])) % 1) if len(phase) > 0 else 0
     
     def _set_opt_param_vals(self, params):
         if not self._is_opt_param_set("frequency_shift", params):
@@ -38,17 +44,17 @@ class _Oscillator(_Param):
 class OscSine(_Oscillator):
     def __init__(self, params):
         super().__init__(params)
-        self.buff = np.sin(2 * np.pi * self.buff * self.frequency / self.sample_rate)
+        self.buff = np.sin(2 * np.pi * self.phase)
 
 class OscSawtooth(_Oscillator):
     def __init__(self, params):
         super().__init__(params)
-        self.buff = np.mod(1 + 2 * self.buff * self.frequency / self.sample_rate, 2) - 1
+        self.buff = np.mod(1 + 2 * self.phase, 2) - 1
 
 class OscTriangle(_Oscillator):
     def __init__(self, params):
         super().__init__(params)
-        self.buff = 2 * np.abs(np.mod(-0.5 + 2 * self.buff * self.frequency / self.sample_rate, 2) -1) - 1
+        self.buff = 2 * np.abs(np.mod(-0.5 + 2 * self.phase, 2) -1) - 1
 
 class OscSquare(OscSawtooth, _Param):
     def __init__(self, params):

@@ -36,11 +36,11 @@ env = EnvExponential(note_params)
 frequencies = list(map(lambda x: x, [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]))
 waves = [OscSine, OscSquare, OscSawtooth, OscTriangle]
 
-params = {**note_params, **{"frequency": random.choice(frequencies) - 10, "oscillator": OscSine}}
-params["frequency_shift"] = 10
+params = {**note_params, **{"frequency": 440, "oscillator": OscSine}}
+params["frequency_shift"] = 0
 params["slide_start"] = 0.5
-params["slide_duration"] = 0.5
-s = Oscillator(params)
+params["slide_duration"] = 1
+s = OscSine(params)
 stream.write(volume*env.apply(s.buff), len(s.buff))
 
 for _ in range(0):
