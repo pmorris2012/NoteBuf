@@ -5,7 +5,6 @@ from param import _Param
 from oscillator import OscSine, OscSquare, OscSawtooth, OscTriangle
 from synth import SynHarmonic
 from envelope import EnvLinear, EnvExponential
-from effect import EffPitchSlide
 from mixer import Mixer
 
 
