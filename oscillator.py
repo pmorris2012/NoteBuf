@@ -12,16 +12,18 @@ class _Oscillator(_Param):
         if self.frequency_shift != 0:
             assert self.slide_start + self.slide_duration < self.duration
 
-            samples1 = int(self.slide_start * self.sample_rate)
-            samples2 = int(self.slide_duration * self.sample_rate)
-            samples3 = int(self.duration * self.sample_rate) - samples2 - samples1
+        samples1 = int(self.slide_start * self.sample_rate)
+        samples2 = int(self.slide_duration * self.sample_rate)
+        samples3 = int(self.duration * self.sample_rate) - samples2 - samples1
 
-            phase1, k1 = self._gen_phase(samples1, self.frequency, self.frequency)
-            phase2, k2 = self._gen_phase(samples2, self.frequency, self.frequency + self.frequency_shift, k1)
-            phase3, _ = self._gen_phase(samples3, self.frequency + self.frequency_shift, self.frequency + self.frequency_shift, k2)
-            self.phase = np.concatenate((phase1, phase2, phase3))
-        else:
-            self.phase, _ = self._gen_phase(int(self.duration * self.sample_rate), self.frequency, self.frequency)
+        phase1, k1 = self._gen_phase(samples1, self.frequency, self.frequency)
+        phase2, k2 = self._gen_phase(samples2, self.frequency, self.frequency + self.frequency_shift, k1)
+        phase3, _ = self._gen_phase(samples3, self.frequency + self.frequency_shift, self.frequency + self.frequency_shift, k2)
+        self.phase = np.concatenate((phase1, phase2, phase3))
+        #else:
+            #self.phase, _ = self._gen_phase(int(self.duration * self.sample_rate), self.frequency, self.frequency)
+
+        print(self.phase)
 
 
     def _gen_phase(self, num_samples, fstart, fend, k=0):

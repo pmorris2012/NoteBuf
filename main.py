@@ -36,9 +36,9 @@ frequencies = list(map(lambda x: x, [220, 246.94, 277.18, 293.66, 329.63, 369.99
 waves = [OscSine, OscSquare, OscSawtooth, OscTriangle]
 
 params = {**note_params, **{"frequency": 440, "oscillator": OscSine}}
-params["frequency_shift"] = 0
+params["frequency_shift"] = 100
 params["slide_start"] = 0.5
-params["slide_duration"] = 1
+params["slide_duration"] = .5
 s = OscSine(params)
 stream.write(volume*env.apply(s.buff), len(s.buff))
 
