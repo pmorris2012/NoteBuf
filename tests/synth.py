@@ -37,22 +37,27 @@ def test_synth_2():
 
     note_params = {
         "start": 0.0,
-        "duration": 0.2,
+        "duration": 0.8,
         "amplitude": 0.8,
-        "attack": 0.02,
-        "decay": 0.17,
+        "attack": 0.08,
+        "decay": 0.08,
         "sustain": 0.4,
-        "release": 0.01,
+        "release": 0.04,
         "sample_rate": 44100,
         "harmonic_vol_list": [1, .8, .82, .6, .4, .2, .1, .02]
     }
 
     env = EnvExponential(note_params)
-    frequencies = list(map(lambda x: x, [220, 246.94, 277.18, 293.66, 329.63, 369.99, 415.30, 440.0]))
+    start_freq = 220
+    steps1 = [0, 4, 7, 12]
+    steps2 = [0, -1, -3, -5, -7]
+    steps3 = [0, 7, 11]
+
+    freq_shift = lambda x, y: x * (2 ** (y / 12))
 
     for _ in range(20):
-        note1 = SynHarmonic({**note_params, **{"frequency": frequencies[_ % len(frequencies)], "oscillator": OscSine}})
-        note2 = SynHarmonic({**note_params, **{"frequency": frequencies[(_ + 2) % len(frequencies)], "oscillator": OscSine}})
-        note3 = SynHarmonic({**note_params, **{"frequency": frequencies[(_ + 4) % len(frequencies)], "oscillator": OscSine}})
+        note1 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps1[_ % len(steps1)]), "oscillator": OscSine}})
+        note2 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps2[_ % len(steps2)]), "oscillator": OscSine}})
+        note3 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps3[_ % len(steps3)]), "oscillator": OscSine}})
         finalbuff = Mixer(note_params, env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff)).buff
         player.write(finalbuff)
