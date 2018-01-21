@@ -1,8 +1,8 @@
 import numpy as np
 
-from param import _Param
-from oscillator import *
-from mixer import Mixer
+from .param import _Param
+from .oscillator import *
+from .mixer import Mixer
 
 
 class SynHarmonic(_Param):

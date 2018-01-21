@@ -1,6 +1,6 @@
 import numpy as np
 
-from param import _Param
+from .param import _Param
 
 
 class Mixer(_Param):

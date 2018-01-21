@@ -1,7 +1,7 @@
 import numpy as np
 import math
 
-from param import _Param
+from .param import _Param
 
 
 class _Envelope(_Param):
@@ -15,9 +15,10 @@ class _Envelope(_Param):
 
         self.a = int(self.attack * self.sample_rate)
         self._d = int(self.decay * self.sample_rate)
-        self.d = int((self.attack+self.decay) * self.sample_rate)
-        self.s = int((self.duration-self.release) * self.sample_rate)
+        self.d = self.a + self._d
         self.r = int(self.release * self.sample_rate)
+        self._s = int((self.duration * self.sample_rate) - self.a - self._d - self.r)
+        self.s = self._s + self._d + self.a
     
     def _set_opt_param_vals(self, params):
         if not self._is_opt_param_set("attack", params):
@@ -39,6 +40,8 @@ class EnvExponential(_Envelope, _Param):
     def __init__(self, params):
         self._setup_opt_param_list(["exp_factor"])
         super().__init__(params)
+
+        print(self.s, self.duration * self.sample_rate, self.r, self.s + self.r)
 
         self.env[:self.a] = self._env_exp(np.linspace(0.0, self.attack, self.a), 0.0, self.amplitude, 0.0, self.attack)
         self.env[self.a:self.d] = self._env_exp(np.linspace(self.attack, self.attack + self.decay, self._d), self.amplitude, self.sustain, self.attack, self.attack + self.decay)
