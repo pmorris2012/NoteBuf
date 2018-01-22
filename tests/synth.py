@@ -36,9 +36,7 @@ def test_synth_2():
     player = Player({ "sample_rate": 44100 })
 
     note_params = {
-        "start": 0.0,
-        "duration": 0.8,
-        "amplitude": 0.8,
+        "amplitude": 0.5,
         "attack": 0.08,
         "decay": 0.08,
         "sustain": 0.4,
@@ -47,17 +45,20 @@ def test_synth_2():
         "harmonic_vol_list": [1, .8, .82, .6, .4, .2, .1, .02]
     }
 
-    env = EnvExponential(note_params)
+    env1 = EnvExponential({**note_params, **{"duration": 0.6}})
+    env2 = EnvExponential({**note_params, **{"duration": 0.4}})
+    env3 = EnvExponential({**note_params, **{"duration": 0.2}})
+
     start_freq = 220
-    steps1 = [0, 4, 7, 12]
-    steps2 = [0, -1, -3, -5, -7]
-    steps3 = [0, 7, 11]
+    steps1 = [ 0, -5, 7, 14]
+    steps2 = [ 0, -1, -3, 19, -7]
+    steps3 = [ 0,  4, 11, 16, 14, 12]
 
     freq_shift = lambda x, y: x * (2 ** (y / 12))
 
-    for _ in range(20):
-        note1 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps1[_ % len(steps1)]), "oscillator": OscSine}})
-        note2 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps2[_ % len(steps2)]), "oscillator": OscSine}})
-        note3 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps3[_ % len(steps3)]), "oscillator": OscSine}})
-        finalbuff = Mixer(note_params).mix(env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff))
+    for _ in range(60):
+        note1 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps1[_ % len(steps1)]), "oscillator": OscSine, "start": 0.0, "duration":0.6}})
+        note2 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps2[_ % len(steps2)]), "oscillator": OscSine, "start": 0.2, "duration":0.4}})
+        note3 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps3[_ % len(steps3)]), "oscillator": OscSine, "start": 0.4, "duration":0.2}})
+        finalbuff = Mixer(note_params).mix(env1.apply(note1.buff), env2.apply(note2.buff), env3.apply(note3.buff))
         player.write(finalbuff)

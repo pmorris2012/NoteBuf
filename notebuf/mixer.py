@@ -10,11 +10,25 @@ class Mixer(_Param):
         super().__init__(params)
 
     def mix(self, *args):
+        start = min([x.start for x in args])
+        duration = max([x.start + x.duration for x in args]) - start
+        sample_rate = args[0].sample_rate
         buff = Buffer({
-            "start": min([x.start for x in args]),
-            "duration": max([x.start + x.duration for x in args]) - min([x.start for x in args]),
-            "sample_rate": args[0].sample_rate
-        }, buff=np.sum([x.buff for x in args], axis=0))
+            "start": start,
+            "duration": duration,
+            "sample_rate": sample_rate
+        })
+        buff.apply(lambda x: x * 0)
+
+        for _buff in args:
+            _start = int(_buff.start * sample_rate)
+            _end = _start + int(_buff.duration * sample_rate)
+
+            def _mix(x):
+                x[_start:_end] += _buff.buff
+                return x
+
+            buff.apply(_mix)
 
         buff.apply(self.scale)
         return buff
