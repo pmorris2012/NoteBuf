@@ -29,7 +29,7 @@ def test_synth_1():
         note1 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
         note2 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
         note3 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
-        finalbuff = Mixer(note_params, env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff)).buff
+        finalbuff = Mixer(note_params, env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff))
         player.write(finalbuff)
 
 def test_synth_2():
@@ -59,5 +59,5 @@ def test_synth_2():
         note1 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps1[_ % len(steps1)]), "oscillator": OscSine}})
         note2 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps2[_ % len(steps2)]), "oscillator": OscSine}})
         note3 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps3[_ % len(steps3)]), "oscillator": OscSine}})
-        finalbuff = Mixer(note_params, env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff)).buff
+        finalbuff = Mixer(note_params).mix(env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff))
         player.write(finalbuff)

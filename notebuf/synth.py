@@ -17,12 +17,12 @@ class SynHarmonic(_Param):
         for volume in self.harmonic_vol_list:
             harm_params = params.copy()
             harm_params["frequency"] = freq
-            harmonics.append(self.oscillator(harm_params).buff * volume)
+            harmonics.append(self.oscillator(harm_params).buff.apply(lambda x: x * volume))
             freq += self.frequency
             if freq > self.sample_rate / 2:
                 break
 
-        self.buff = Mixer(params, *harmonics).buff
+        self.buff = Mixer(params).mix(*harmonics)
 
     def _set_opt_param_vals(self, params):
         if not self._is_opt_param_set("harmonic_vol_list", params):
