@@ -36,10 +36,10 @@ def test_synth_2():
     player = Player({ "sample_rate": 44100 })
 
     note_params = {
-        "amplitude": 0.5,
-        "attack": 0.08,
+        "amplitude": 0.7,
+        "attack": 0.06,
         "decay": 0.08,
-        "sustain": 0.4,
+        "sustain": 0.6,
         "release": 0.04,
         "sample_rate": 44100,
         "harmonic_vol_list": [1, .8, .82, .6, .4, .2, .1, .02]
@@ -56,9 +56,11 @@ def test_synth_2():
 
     freq_shift = lambda x, y: x * (2 ** (y / 12))
 
+    buffs = []
     for _ in range(60):
         note1 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps1[_ % len(steps1)]), "oscillator": OscSine, "start": 0.0, "duration":0.6}})
         note2 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps2[_ % len(steps2)]), "oscillator": OscSine, "start": 0.2, "duration":0.4}})
         note3 = SynHarmonic({**note_params, **{"frequency": freq_shift(start_freq, steps3[_ % len(steps3)]), "oscillator": OscSine, "start": 0.4, "duration":0.2}})
-        finalbuff = Mixer(note_params).mix(env1.apply(note1.buff), env2.apply(note2.buff), env3.apply(note3.buff))
-        player.write(finalbuff)
+        buffs.append(Mixer({**note_params, **{"start": 0.6 * _}}).mix(env1.apply(note1.buff), env2.apply(note2.buff), env3.apply(note3.buff)))
+    finalbuff = Mixer({}).mix(*buffs)
+    player.write(finalbuff)

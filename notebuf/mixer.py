@@ -6,7 +6,7 @@ from .buffer import Buffer
 
 class Mixer(_Param):
     def __init__(self, params):
-        self._setup_opt_param_list(["amplitude"])
+        self._setup_opt_param_list(["start", "amplitude"])
         super().__init__(params)
 
     def mix(self, *args):
@@ -14,7 +14,7 @@ class Mixer(_Param):
         duration = max([x.start + x.duration for x in args]) - start
         sample_rate = args[0].sample_rate
         buff = Buffer({
-            "start": start,
+            "start": self.start + start,
             "duration": duration,
             "sample_rate": sample_rate
         })
@@ -43,4 +43,6 @@ class Mixer(_Param):
     def _set_opt_param_vals(self, params):
         if not self._is_opt_param_set("amplitude", params):
             self.amplitude = None
+        if not self._is_opt_param_set("start", params):
+            self.start = 0
         super()._set_opt_param_vals(params)
