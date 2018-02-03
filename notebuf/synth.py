@@ -32,3 +32,29 @@ class SynHarmonic(_Param):
         if not self._is_opt_param_set("start", params):
             self.start = 0
         super()._set_opt_param_vals(params)
+
+class SynSubtractive(_Param):
+    def __init__(self, params):
+        self._setup_param_list(["duration", "amplitude", "frequency", "sample_rate", "oscillator"])
+        self._setup_opt_param_list(["start"])
+        super().__init__(params)
+
+        buff = self.oscillator(params).buff
+
+        print(buff.buff)
+        freqs = np.fft.fft(buff.buff)
+        buff.buff = np.real(np.fft.ifft(freqs))
+        print(buff.buff)
+        import matplotlib.pyplot as plt
+        plt.plot(freqs)
+        #plt.show()
+
+        self.buff = buff
+
+    def _set_opt_param_vals(self, params):
+        if not self._is_opt_param_set("harmonic_vol_list", params):
+            self.harmonic_vol_list = [1 / x for x in range(1, int(self.sample_rate / (2 * self.frequency)) + 1)]
+        if not self._is_opt_param_set("start", params):
+            self.start = 0
+        super()._set_opt_param_vals(params)
+

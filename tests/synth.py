@@ -2,9 +2,22 @@ import random
 
 from notebuf.oscillator import OscSine, OscSquare, OscSawtooth, OscTriangle
 from notebuf.envelope import EnvExponential
-from notebuf.synth import SynHarmonic
+from notebuf.synth import SynHarmonic, SynSubtractive
 from notebuf.mixer import Mixer
 from notebuf.player import Player
+
+def test_osc_1():
+    player = Player({ "sample_rate": 44100 })
+
+    note_params = {
+        "start": 0.0,
+        "duration": 0.4,
+        "amplitude": 1,
+        "frequency": 440,
+        "sample_rate": 44100
+    }
+
+    player.write(OscSine(note_params).buff)
 
 def test_synth_1():
     player = Player({ "sample_rate": 44100 })
@@ -64,3 +77,22 @@ def test_synth_2():
         buffs.append(Mixer({**note_params, **{"start": 0.6 * _}}).mix(env1.apply(note1.buff), env2.apply(note2.buff), env3.apply(note3.buff)))
     finalbuff = Mixer({}).mix(*buffs)
     player.write(finalbuff)
+
+def test_synth_sub():
+    player = Player({ "sample_rate": 44100 })
+
+    note_params = {
+        "start": 0,
+        "duration": 1,
+        "frequency": 220,
+        "amplitude": 0.7,
+        "attack": 0.06,
+        "decay": 0.08,
+        "sustain": 0.6,
+        "release": 0.04,
+        "sample_rate": 44100,
+        "oscillator": OscSquare
+    }
+
+    env = EnvExponential(note_params)
+    player.write(env.apply(SynSubtractive(note_params).buff))
