@@ -1,3 +1,3 @@
 from tests.synth import *
 
-test_synth_2()
+test_osc_saw()

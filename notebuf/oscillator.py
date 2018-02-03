@@ -1,7 +1,9 @@
 import numpy as np
+import math
 
 from .param import _Param
 from .buffer import Buffer
+#from .synth import SynHarmonic
 
 
 class _Oscillator(_Param):
@@ -9,6 +11,7 @@ class _Oscillator(_Param):
         self._setup_param_list(["duration", "amplitude", "frequency", "sample_rate"])
         super().__init__(params)
         self.buff = Buffer(params)
+        print(self.buff.buff)
         
 
 class OscSine(_Oscillator):
@@ -25,7 +28,8 @@ class OscSawtooth(_Oscillator):
         self.buff.apply(self.sawtooth)
         
     def sawtooth(self, x):
-        return np.mod(1 + 2 * x * self.frequency / self.sample_rate, 2) - 1
+        N_harmonics = math.floor(self.sample_rate / (2 * self.frequency))
+        return (self.amplitude / 2) - (self.amplitude / np.pi) * np.sum([(math.pow(-1, k) * np.sin(2 * np.pi * k * self.frequency * x / self.sample_rate) / k) for k in range(1, N_harmonics + 1)], axis=0)
 
 class OscTriangle(_Oscillator):
     def __init__(self, params):

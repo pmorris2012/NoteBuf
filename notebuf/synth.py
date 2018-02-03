@@ -1,7 +1,6 @@
 import numpy as np
 
 from .param import _Param
-from .oscillator import *
 from .mixer import Mixer
 
 

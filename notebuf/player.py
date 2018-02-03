@@ -1,4 +1,5 @@
 import pyaudio
+import numpy as np
 
 from .param import _Param
 
@@ -22,7 +23,7 @@ class Player(_Param):
         super()._set_opt_param_vals(params)
 
     def write(self, buff):
-        self._stream.write(self.volume * buff.buff, len(buff.buff))
+        self._stream.write(self.volume * buff.buff.astype(np.float32), len(buff.buff))
 
     def __del__(self):
         self._stream.stop_stream()
