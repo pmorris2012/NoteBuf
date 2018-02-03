@@ -22,3 +22,12 @@ class Buffer(_Param):
     def apply(self, fn):
         self.buff = fn(self.buff)
         return self
+
+    def __getitem__(self, key):
+        return self.buff[key]
+    
+    def __setitem__(self, key, value):
+        self.buff[key] = value
+
+    def __repr__(self):
+        return 'Buffer({})'.format(self.buff)

@@ -1,3 +1,3 @@
 from tests.synth import *
 
-test_osc_1()
+test_synth_sub()

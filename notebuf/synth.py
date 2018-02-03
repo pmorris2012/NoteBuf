@@ -3,6 +3,7 @@ import numpy as np
 from .param import _Param
 from .oscillator import *
 from .mixer import Mixer
+from .filter import LowPass
 
 
 class SynHarmonic(_Param):
@@ -40,14 +41,9 @@ class SynSubtractive(_Param):
         super().__init__(params)
 
         buff = self.oscillator(params).buff
+        self.filter = LowPass(params)
 
-        print(buff.buff)
-        freqs = np.fft.fft(buff.buff)
-        buff.buff = np.real(np.fft.ifft(freqs))
-        print(buff.buff)
-        import matplotlib.pyplot as plt
-        plt.plot(freqs)
-        #plt.show()
+        self.filter.apply(buff)
 
         self.buff = buff
 

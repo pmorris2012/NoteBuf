@@ -84,7 +84,7 @@ def test_synth_sub():
     note_params = {
         "start": 0,
         "duration": 1,
-        "frequency": 220,
+        "frequency": 440,
         "amplitude": 0.7,
         "attack": 0.06,
         "decay": 0.08,
@@ -95,4 +95,5 @@ def test_synth_sub():
     }
 
     env = EnvExponential(note_params)
+    player.write(env.apply(OscSquare(note_params).buff))
     player.write(env.apply(SynSubtractive(note_params).buff))
