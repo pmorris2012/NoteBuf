@@ -11,28 +11,19 @@ def test_osc_saw():
 
     note_params = {
         "start": 0.0,
-        "duration": 10,
+        "duration": 1,
         "amplitude": 0.8,
         "attack": 0.01,
         "decay": 0.02,
         "sustain": 0.4,
         "release": 0.08,
         "sample_rate": 44100,
-        "frequency": 30
+        "frequency": 10000
     }
 
     env = EnvExponential(note_params)
-    note1 = OscSawtooth(note_params)
-    import matplotlib.pyplot as plt
-    from scipy.fftpack import fft, ifft
-    c = fft(note1.buff.buff)
-    d = int(len(c)/2)
-    plt.plot(abs(c[:(d-1)]), 'r')
-    plt.show()
-    c[0] = 0
-    newbuff = ifft(c).real
-    note1.buff.buff = newbuff
-    player.write(note1.buff)
+    note1 = OscSquare(note_params)
+    player.write(env.apply(note1.buff))
 
 def test_synth_1():
     player = Player({ "sample_rate": 44100 })
