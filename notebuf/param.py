@@ -1,3 +1,6 @@
+class UnsetParam(Exception):
+    pass
+
 class UnsetOptParam(Exception):
     pass
 
@@ -33,7 +36,8 @@ class _Param():
 
     def _assert_params(self, params):
         for p in self.param_list:
-            assert p in params
+            if p not in params:
+                raise UnsetParam(p)
 
     def _set_opt_param_vals(self, params):
         for param in self.opt_param_list:

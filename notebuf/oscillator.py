@@ -3,15 +3,19 @@ import math
 
 from .param import _Param
 from .buffer import Buffer
-#from .synth import SynHarmonic
+from .synth import SynHarmonic
 
 
 class _Oscillator(_Param):
     def __init__(self, params):
         self._setup_param_list(["duration", "amplitude", "frequency", "sample_rate"])
+        self._setup_opt_param_list(["band_limited"])
         super().__init__(params)
         self.buff = Buffer(params)
-        
+
+    def _set_opt_param_vals(self, params):
+        if not self._is_opt_param_set("band_limited", params):
+            self.band_limited = True
 
 class OscSine(_Oscillator):
     def __init__(self, params):
@@ -24,7 +28,12 @@ class OscSine(_Oscillator):
 class OscSawtooth(_Oscillator):
     def __init__(self, params):
         super().__init__(params)
-        self.buff.apply(self.sawtooth)
+        #self.buff.apply(self.sawtooth)
+        N_harmonics = math.floor(self.sample_rate / (2 * self.frequency))
+        harm_params = params.copy()
+        harm_params["oscillator"] = OscSine
+        harm_params["harmonic_vol_list"] = [(math.pow(-1, x) / x) for x in range(1, N_harmonics + 1)]
+        self.buff = SynHarmonic(harm_params).buff.apply(lambda x: x * -1)
         
     def sawtooth(self, x):
         N_harmonics = math.floor(self.sample_rate / (2 * self.frequency))
