@@ -15,8 +15,8 @@ def test_osc_bandl():
         "duration": .5,
         "amplitude": 1,
         "sample_rate": 44100,
-        "frequency": 100,
-        "band_limited": False
+        "frequency": 50,
+        "band_limited": True
     }
 
     env_params = {
@@ -33,6 +33,10 @@ def test_osc_bandl():
     note1 = OscSquare(note_params)
     print(note1.buff.buff.max())
     player.write(env.apply(note1.buff))
+    
+    from matplotlib import pyplot as plt
+    plt.plot(note1.buff.buff)
+    plt.show()
 
 def test_synth_1():
     player = Player({ "sample_rate": 44100 })
