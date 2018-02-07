@@ -8,6 +8,7 @@ class UnsetOptParam(Exception):
 class _Param():
 
     def __init__(self, params):
+        self.params = params
         self._setup_param_list([])
         self._setup_opt_param_list([])
         self._import_params(params)

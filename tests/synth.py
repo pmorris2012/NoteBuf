@@ -7,19 +7,20 @@ from notebuf.synth import SynHarmonic
 from notebuf.mixer import Mixer
 from notebuf.player import Player
 
-def test_osc_saw():
+def test_osc_bandl():
     player = Player({ "sample_rate": 44100 })
 
     note_params = {
         "start": 0.0,
-        "duration": 1,
+        "duration": .5,
         "amplitude": 1,
         "sample_rate": 44100,
-        "frequency": 400
+        "frequency": 100,
+        "band_limited": False
     }
 
     env_params = {
-        "duration": 1,
+        "duration": .5,
         "amplitude": 0.8,
         "sample_rate": 44100,
         "attack": 0.01,
@@ -29,7 +30,8 @@ def test_osc_saw():
     }
 
     env = EnvExponential(env_params)
-    note1 = OscSawtooth(note_params)
+    note1 = OscSquare(note_params)
+    print(note1.buff.buff.max())
     player.write(env.apply(note1.buff))
 
 def test_synth_1():
