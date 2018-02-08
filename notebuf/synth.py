@@ -1,7 +1,6 @@
 import numpy as np
 
 from .param import _Param
-from .oscillator import *
 from .mixer import Mixer
 from .filter import LowPass
 
@@ -16,6 +15,9 @@ class SynHarmonic(_Param):
         harmonics = []
         freq = self.frequency
         for volume in self.harmonic_vol_list:
+            if volume == 0:
+                continue
+                
             harm_params = params.copy()
             harm_params["frequency"] = freq
             harm_params["start"] = 0

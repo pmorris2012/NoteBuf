@@ -1,4 +1,5 @@
 import random
+import numpy as np
 
 from notebuf.oscillator import OscSine, OscSquare, OscSawtooth, OscTriangle
 from notebuf.envelope import EnvExponential
@@ -11,13 +12,26 @@ def test_osc_1():
 
     note_params = {
         "start": 0.0,
-        "duration": 0.4,
+        "duration": .5,
         "amplitude": 1,
-        "frequency": 440,
-        "sample_rate": 44100
+        "sample_rate": 44100,
+        "frequency": 50,
+        "band_limited": True
     }
 
-    player.write(OscSine(note_params).buff)
+    env_params = {
+        "duration": .5,
+        "amplitude": 0.8,
+        "sample_rate": 44100,
+        "attack": 0.01,
+        "decay": 0.02,
+        "sustain": 0.4,
+        "release": 0.08,
+    }
+
+    env = EnvExponential(env_params)
+    note1 = OscTriangle(note_params)
+    player.write(env.apply(note1.buff))
 
 def test_synth_1():
     player = Player({ "sample_rate": 44100 })
@@ -31,6 +45,7 @@ def test_synth_1():
         "sustain": 0.4,
         "release": 0.08,
         "sample_rate": 44100,
+        "band_limited": True,
         "harmonic_vol_list": [.06, 1, .38, 0, .13, .15, 0, .04, .23, .18, 0, .12]
     }
 
@@ -42,7 +57,7 @@ def test_synth_1():
         note1 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
         note2 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
         note3 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
-        finalbuff = Mixer(note_params, env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff))
+        finalbuff = Mixer(note_params).mix(env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff))
         player.write(finalbuff)
 
 def test_synth_2():
