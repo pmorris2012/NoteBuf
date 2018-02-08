@@ -30,13 +30,8 @@ def test_osc_bandl():
     }
 
     env = EnvExponential(env_params)
-    note1 = OscSquare(note_params)
-    print(note1.buff.buff.max())
+    note1 = OscTriangle(note_params)
     player.write(env.apply(note1.buff))
-    
-    from matplotlib import pyplot as plt
-    plt.plot(note1.buff.buff)
-    plt.show()
 
 def test_synth_1():
     player = Player({ "sample_rate": 44100 })
@@ -50,6 +45,7 @@ def test_synth_1():
         "sustain": 0.4,
         "release": 0.08,
         "sample_rate": 44100,
+        "band_limited": True,
         "harmonic_vol_list": [.06, 1, .38, 0, .13, .15, 0, .04, .23, .18, 0, .12]
     }
 
@@ -61,7 +57,7 @@ def test_synth_1():
         note1 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
         note2 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
         note3 = SynHarmonic({**note_params, **{"frequency": random.choice(frequencies), "oscillator": random.choice(waves)}})
-        finalbuff = Mixer(note_params, env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff))
+        finalbuff = Mixer(note_params).mix(env.apply(note1.buff), env.apply(note2.buff), env.apply(note3.buff))
         player.write(finalbuff)
 
 def test_synth_2():

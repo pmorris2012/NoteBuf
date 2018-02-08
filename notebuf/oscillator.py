@@ -42,7 +42,7 @@ class OscSine(_Oscillator):
         self.buff.apply(self._get_fn())
 
     def fn(self, x):
-        return np.sin(2 * np.pi * x * self.frequency)
+        return self.amplitude * np.sin(2 * np.pi * x * self.frequency)
 
 class OscSawtooth(_Oscillator):
     def __init__(self, params):
@@ -50,7 +50,7 @@ class OscSawtooth(_Oscillator):
         self.buff.apply(self._get_fn())
         
     def fn(self, x):
-        return np.mod(1 + 2 * x * self.frequency, 2) - 1
+        return self.amplitude * np.mod(1 + 2 * x * self.frequency, 2) - 1
 
     def band_limited_fn(self, x):
         harm_params = self.params.copy()
@@ -63,7 +63,7 @@ class OscSawtooth(_Oscillator):
         else:
             harm_params["harmonic_vol_list"] = [1 / x for x in range(1, self._get_n_harmonics() + 1)]
         
-        return SynHarmonic(harm_params).buff.apply(lambda x: x * -1).buff
+        return self.amplitude * SynHarmonic(harm_params).buff.apply(lambda x: x * -1).buff
 
 class OscTriangle(_Oscillator):
     def __init__(self, params):
@@ -71,14 +71,14 @@ class OscTriangle(_Oscillator):
         self.buff.apply(self._get_fn())
     
     def fn(self, x):
-        return 2 * np.abs(np.mod(-0.5 + 2 * x * self.frequency, 2) -1) - 1
+        return self.amplitude * 2 * np.abs(np.mod(-0.5 + 2 * x * self.frequency, 2) -1) - 1
 
     def band_limited_fn(self, x):
         harm_params = self.params.copy()
         harm_params["oscillator"] = OscSine
         harm_params["harmonic_vol_list"] = [(0 if x % 2 == 0 else (math.pow(-1, (x-1)/2) / (x * x))) for x in range(1, self._get_n_harmonics() + 1)]
         
-        return SynHarmonic(harm_params).buff.buff
+        return self.amplitude * SynHarmonic(harm_params).buff.buff
 
 class OscSquare(_Oscillator):
     def __init__(self, params):
@@ -89,7 +89,7 @@ class OscSquare(_Oscillator):
         self.buff.apply(self._get_fn())
 
     def fn(self, x):
-        return np.sign(np.mod(1 + 2 * x * self.frequency, 2) - 2 * self.duty_cycle)
+        return self.amplitude * np.sign(np.mod(1 + 2 * x * self.frequency, 2) - 2 * self.duty_cycle)
         
     def band_limited_fn(self, x):
         harm_params = self.params.copy()
@@ -102,7 +102,7 @@ class OscSquare(_Oscillator):
         else:
             harm_params["harmonic_vol_list"] = [(0 if x % 2 == 0 else (1 / x)) for x in range(1, self._get_n_harmonics() + 1)]
         
-        return SynHarmonic(harm_params).buff.buff
+        return self.amplitude * SynHarmonic(harm_params).buff.buff
 
     def _set_opt_param_vals(self, params):
         if not self._is_opt_param_set("duty_cycle", params):
