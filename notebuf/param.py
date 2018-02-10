@@ -6,7 +6,6 @@ class UnsetOptParam(Exception):
 
 
 class _Param():
-
     def __init__(self, params):
         self.params = params
         self._setup_param_list([])
@@ -47,3 +46,10 @@ class _Param():
 
     def _is_opt_param_set(self, param, params):
         return param in params or param in vars(self)
+
+class ParamGroup(dict):
+    def copy_with(self, dictionary):
+        p = self.copy()
+        p.update(dictionary)
+        return ParamGroup(p)
+

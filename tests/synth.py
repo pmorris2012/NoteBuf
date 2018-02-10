@@ -7,6 +7,7 @@ from notebuf.synth import SynHarmonic
 from notebuf.mixer import Mixer
 from notebuf.player import Player
 from notebuf.filter import LowPass, HighPass, BandPass, BandStop
+from notebuf.param import ParamGroup
 
 def test_osc_1():
     player = Player({ "sample_rate": 44100 })
@@ -95,30 +96,49 @@ def test_synth_2():
     player.write(finalbuff)
 
 def test_synth_sub():
-    player = Player({ "sample_rate": 44100 })
+    params = ParamGroup({
+        "duration": .3,
+        "sample_rate": 44100 })
+    
+    player = Player(params)
 
-    note_params = {
-        "start": 0,
-        "duration": 1,
-        "frequency": 440,
+    env_params = params.copy_with({
         "amplitude": 0.7,
         "attack": 0.06,
-        "decay": 0.08,
+        "decay": 0.02,
         "sustain": 0.6,
-        "release": 0.04,
-        "sample_rate": 44100,
-        "oscillator": OscSawtooth
-    }
+        "release": 0.04 })
 
-    filt_params = {
-        "sample_rate": 44100,
-        "frequency": 380,
-        "lowcut": 380,
-        "highcut": 500,
-        "order": 6
-    }
+    filt_params = params.copy_with({
+        "lowcut": 1000,
+        "highcut": 2000 })
 
-    lp = BandStop(filt_params)
-    env = EnvExponential(note_params)
-    player.write(env.apply(OscSawtooth(note_params).buff))
-    player.write(env.apply(lp.apply(OscSawtooth(note_params).buff)))
+    filt_params2 = params.copy_with({
+        "highcut": 3000 })
+
+    def apply(buff):
+        BandStop(filt_params).apply(buff)
+        LowPass(filt_params2).apply(buff)
+        EnvExponential(env_params).apply(buff)
+        return buff
+
+    buffs1, buffs2 = [], []
+    for i in range(32):
+        i_params = params.copy_with({
+            "start": i * 0.08,
+            "amplitude": 1 - (i / 32),
+            "frequency": 760 - (i * 10) })
+
+        buffs1.append(apply(OscSawtooth(i_params).buff))
+
+    for i in range(32):
+        i_params = params.copy_with({
+            "start": i * 0.08,
+            "amplitude": 1 - (i / 32),
+            "frequency": 440 + (i * 10) })
+
+        buffs2.append(apply(OscSawtooth(i_params).buff))
+
+    finalbuff = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
+
+    player.write(finalbuff)
