@@ -3,9 +3,10 @@ import numpy as np
 
 from notebuf.oscillator import OscSine, OscSquare, OscSawtooth, OscTriangle
 from notebuf.envelope import EnvExponential
-from notebuf.synth import SynHarmonic, SynSubtractive
+from notebuf.synth import SynHarmonic
 from notebuf.mixer import Mixer
 from notebuf.player import Player
+from notebuf.filter import LowPass, HighPass, BandPass, BandStop
 
 def test_osc_1():
     player = Player({ "sample_rate": 44100 })
@@ -106,9 +107,18 @@ def test_synth_sub():
         "sustain": 0.6,
         "release": 0.04,
         "sample_rate": 44100,
-        "oscillator": OscSquare
+        "oscillator": OscSawtooth
     }
 
+    filt_params = {
+        "sample_rate": 44100,
+        "frequency": 380,
+        "lowcut": 380,
+        "highcut": 500,
+        "order": 6
+    }
+
+    lp = BandStop(filt_params)
     env = EnvExponential(note_params)
-    player.write(env.apply(OscSquare(note_params).buff))
-    player.write(env.apply(SynSubtractive(note_params).buff))
+    player.write(env.apply(OscSawtooth(note_params).buff))
+    player.write(env.apply(lp.apply(OscSawtooth(note_params).buff)))
