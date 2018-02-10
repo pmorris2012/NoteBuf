@@ -14,7 +14,7 @@ class Player(_Param):
         # for paFloat32 sample values must be in range [-1.0, 1.0]
         self._stream = self._p.open(format=pyaudio.paFloat32,
                         channels=1,
-                        rate=44100,
+                        rate=int(self.sample_rate),
                         output=True)
 
     def _set_opt_param_vals(self, params):

@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from decimal import Decimal
 
 from .param import _Param
 
@@ -11,7 +12,7 @@ class Buffer(_Param):
         super().__init__(params)
 
         if not isinstance(buff, np.ndarray):
-            self.buff = np.arange(int(self.sample_rate * self.duration), dtype=np.float64) / self.sample_rate
+            self.buff = np.arange(int(Decimal(self.sample_rate) * Decimal(self.duration)), dtype=np.float64) / self.sample_rate
         else:
             self.buff = buff
 

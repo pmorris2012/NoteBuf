@@ -97,7 +97,7 @@ def test_synth_2():
 
 def test_synth_sub():
     params = ParamGroup({
-        "duration": .3,
+        "duration": .18,
         "sample_rate": 44100 })
     
     player = Player(params)
@@ -125,7 +125,7 @@ def test_synth_sub():
     buffs1, buffs2 = [], []
     for i in range(32):
         i_params = params.copy_with({
-            "start": i * 0.08,
+            "start": i * 0.2,
             "amplitude": 1 - (i / 32),
             "frequency": 760 - (i * 10) })
 
@@ -133,7 +133,7 @@ def test_synth_sub():
 
     for i in range(32):
         i_params = params.copy_with({
-            "start": i * 0.08,
+            "start": i * 0.2,
             "amplitude": 1 - (i / 32),
             "frequency": 440 + (i * 10) })
 

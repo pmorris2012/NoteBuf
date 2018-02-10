@@ -1,5 +1,6 @@
 import numpy as np
 import math
+from decimal import Decimal
 
 from .param import _Param
 from .buffer import Buffer
@@ -14,11 +15,11 @@ class _Envelope(_Param):
         
         self.env = Buffer(params)
 
-        self.a = int(self.attack * self.sample_rate)
-        self._d = int(self.decay * self.sample_rate)
+        self.a = int(Decimal(self.attack) * Decimal(self.sample_rate))
+        self._d = int(Decimal(self.decay) * Decimal(self.sample_rate))
         self.d = self.a + self._d
-        self.r = int(self.release * self.sample_rate)
-        self._s = int((self.duration * self.sample_rate) - self.a - self._d - self.r)
+        self.r = int(Decimal(self.release) * Decimal(self.sample_rate))
+        self._s = int((Decimal(self.duration) * Decimal(self.sample_rate)) - self.a - self._d - self.r)
         self.s = self._s + self._d + self.a
     
     def _set_opt_param_vals(self, params):

@@ -1,4 +1,5 @@
 import numpy as np
+from decimal import Decimal
 
 from .param import _Param
 from .buffer import Buffer
@@ -21,8 +22,8 @@ class Mixer(_Param):
         buff.apply(lambda x: x * 0)
 
         for _buff in args:
-            _start = int(_buff.start * sample_rate)
-            _end = _start + int(_buff.duration * sample_rate)
+            _start = int(Decimal(_buff.start) * Decimal(sample_rate))
+            _end = _start + int(Decimal(_buff.duration) * Decimal(sample_rate))
 
             def _mix(x):
                 x[_start:_end] += _buff.buff
