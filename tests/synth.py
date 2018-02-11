@@ -144,13 +144,11 @@ def test_synth_sub():
         buffs2.append(apply(OscSawtooth(i_params).buff))
 
     sm = StereoMixer(mix_params)
-    mm = MonoMixer(mix_params.copy_with({"pan": 0.7}))
 
     lbuff, rbuff = sm.mix(*buffs1, *buffs2)
-    lbuff2, rbuff2 = sm.mix(mm.mix(lbuff, rbuff))
 
     player.write(lbuff, rbuff)
     player.wait()
 
-    player.write(lbuff2, rbuff2)
+    player.write(rbuff, lbuff)
     player.wait()
