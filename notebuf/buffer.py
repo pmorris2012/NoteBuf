@@ -8,7 +8,7 @@ from .param import _Param
 class Buffer(_Param):
     def __init__(self, params, buff=None):
         self._setup_param_list(["duration", "sample_rate"])
-        self._setup_opt_param_list(["start"])
+        self._setup_opt_param_list(["start", "pan"])
         super().__init__(params)
 
         if not isinstance(buff, np.ndarray):
@@ -19,6 +19,8 @@ class Buffer(_Param):
     def _set_opt_param_vals(self, params):
         if not self._is_opt_param_set("start", params):
             self.start = 0
+        if not self._is_opt_param_set("pan", params):
+            self.pan = 0.5
         super()._set_opt_param_vals(params)
 
     def apply(self, fn):

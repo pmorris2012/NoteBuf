@@ -141,5 +141,7 @@ def test_synth_sub():
 
     finalbuff = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
     
+    player.write(finalbuff)
+    player.wait()
     player.write(finalbuff, finalbuff)
     player.wait()
