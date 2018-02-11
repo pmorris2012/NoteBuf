@@ -33,3 +33,6 @@ class Buffer(_Param):
 
     def __repr__(self):
         return 'Buffer({})'.format(self.buff)
+
+    def copy(self):
+        return Buffer(self.params, self.buff.copy())
