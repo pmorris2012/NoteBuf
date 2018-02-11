@@ -139,9 +139,7 @@ def test_synth_sub():
 
         buffs2.append(apply(OscSawtooth(i_params).buff))
 
-    finalbuff1 = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
-    finalbuff2 = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
-    finalbuff2.start = finalbuff1.duration
-    finalbuff = Mixer({"amplitude": 1}).mix(finalbuff1, finalbuff2)
+    finalbuff = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
     
-    player.write(finalbuff)
+    player.write(finalbuff, finalbuff)
+    player.wait()
