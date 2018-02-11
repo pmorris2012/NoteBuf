@@ -4,7 +4,7 @@ import numpy as np
 from notebuf.oscillator import OscSine, OscSquare, OscSawtooth, OscTriangle
 from notebuf.envelope import EnvExponential
 from notebuf.synth import SynHarmonic
-from notebuf.mixer import Mixer
+from notebuf.mixer import MonoMixer, StereoMixer
 from notebuf.player import Player
 from notebuf.filter import LowPass, HighPass, BandPass, BandStop
 from notebuf.param import ParamGroup
@@ -116,6 +116,8 @@ def test_synth_sub():
     filt_params2 = params.copy_with({
         "highcut": 3000 })
 
+    mix_params = ParamGroup({"amplitude": 1})
+
     def apply(buff):
         BandStop(filt_params).apply(buff)
         LowPass(filt_params2).apply(buff)
@@ -127,7 +129,8 @@ def test_synth_sub():
         i_params = params.copy_with({
             "start": 0.02 + i * 0.10,
             "amplitude": 1 - (i / 64),
-            "frequency": 860 - (i * 2) })
+            "frequency": 860 - (i * 2),
+            "pan": 0.2 })
 
         buffs1.append(apply(OscSawtooth(i_params).buff))
 
@@ -135,13 +138,19 @@ def test_synth_sub():
         i_params = params.copy_with({
             "start": i * 0.10,
             "amplitude": 1 - (i / 64),
-            "frequency": 220 + (i * i * 2) })
+            "frequency": 220 + (i * i * 2),
+            "pan": 0.8 })
 
         buffs2.append(apply(OscSawtooth(i_params).buff))
 
-    finalbuff = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
-    
-    player.write(finalbuff)
+    sm = StereoMixer(mix_params)
+    mm = MonoMixer(mix_params.copy_with({"pan": 0.7}))
+
+    lbuff, rbuff = sm.mix(*buffs1, *buffs2)
+    lbuff2, rbuff2 = sm.mix(mm.mix(lbuff, rbuff))
+
+    player.write(lbuff, rbuff)
     player.wait()
-    player.write(finalbuff, finalbuff)
+
+    player.write(lbuff2, rbuff2)
     player.wait()

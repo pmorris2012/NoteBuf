@@ -23,8 +23,8 @@ class Buffer(_Param):
             self.pan = 0.5
         super()._set_opt_param_vals(params)
 
-    def apply(self, fn):
-        self.buff = fn(self.buff)
+    def apply(self, fn, *args):
+        self.buff = fn(self.buff, *args)
         return self
 
     def __getitem__(self, key):

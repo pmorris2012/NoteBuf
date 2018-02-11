@@ -53,16 +53,18 @@ class OscSawtooth(_Oscillator):
         return self.amplitude * np.mod(1 + 2 * x * self.frequency, 2) - 1
 
     def band_limited_fn(self, x):
-        harm_params = self.params.copy()
-        harm_params["oscillator"] = OscSine
-
         if self._check_sigma():
             l = self._get_n_harmonics()
             sigmas = [np.sin(n * np.pi / l) / (n * np.pi / l) for n in range(1, l + 1)]
-            harm_params["harmonic_vol_list"] = [sigma / (i + 1) for i, sigma in enumerate(sigmas)]
+            harmonic_vol_list = [sigma / (i + 1) for i, sigma in enumerate(sigmas)]
         else:
-            harm_params["harmonic_vol_list"] = [1 / x for x in range(1, self._get_n_harmonics() + 1)]
+            harmonic_vol_list = [1 / x for x in range(1, self._get_n_harmonics() + 1)]
         
+        harm_params = self.params.copy_with({
+            "oscillator": OscSine,
+            "harmonic_vol_list": harmonic_vol_list
+        })
+
         return self.amplitude * SynHarmonic(harm_params).buff.apply(lambda x: x * -1).buff
 
 class OscTriangle(_Oscillator):
@@ -74,9 +76,10 @@ class OscTriangle(_Oscillator):
         return self.amplitude * 2 * np.abs(np.mod(-0.5 + 2 * x * self.frequency, 2) -1) - 1
 
     def band_limited_fn(self, x):
-        harm_params = self.params.copy()
-        harm_params["oscillator"] = OscSine
-        harm_params["harmonic_vol_list"] = [(0 if x % 2 == 0 else (math.pow(-1, (x-1)/2) / (x * x))) for x in range(1, self._get_n_harmonics() + 1)]
+        harm_params = self.params.copy_with({
+            "oscillator": OscSine,
+            "haromonic_vol_list": [(0 if x % 2 == 0 else (math.pow(-1, (x-1)/2) / (x * x))) for x in range(1, self._get_n_harmonics() + 1)]
+        })
         
         return self.amplitude * SynHarmonic(harm_params).buff.buff
 
@@ -92,16 +95,19 @@ class OscSquare(_Oscillator):
         return self.amplitude * np.sign(np.mod(1 + 2 * x * self.frequency, 2) - 2 * self.duty_cycle)
         
     def band_limited_fn(self, x):
-        harm_params = self.params.copy()
-        harm_params["oscillator"] = OscSine
-
         if self._check_sigma():
             l = self._get_n_harmonics()
             sigmas = [(0 if n % 2 == 0 else (np.sin(n * np.pi / l) / (n * np.pi / l))) for n in range(1, l + 1)]
-            harm_params["harmonic_vol_list"] = [sigma / (i + 1) for i, sigma in enumerate(sigmas)]
+            harmonic_vol_list = [sigma / (i + 1) for i, sigma in enumerate(sigmas)]
         else:
-            harm_params["harmonic_vol_list"] = [(0 if x % 2 == 0 else (1 / x)) for x in range(1, self._get_n_harmonics() + 1)]
+            harmonic_vol_list = [(0 if x % 2 == 0 else (1 / x)) for x in range(1, self._get_n_harmonics() + 1)]
         
+        
+        harm_params = self.params.copy_with({
+            "oscillator": OscSine,
+            "harmonic_vol_list": harmonic_vol_list
+        })
+
         return self.amplitude * SynHarmonic(harm_params).buff.buff
 
     def _set_opt_param_vals(self, params):
