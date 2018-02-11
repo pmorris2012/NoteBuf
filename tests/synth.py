@@ -97,17 +97,17 @@ def test_synth_2():
 
 def test_synth_sub():
     params = ParamGroup({
-        "duration": .18,
+        "duration": .08,
         "sample_rate": 44100 })
     
     player = Player(params)
 
     env_params = params.copy_with({
         "amplitude": 0.7,
-        "attack": 0.06,
-        "decay": 0.02,
+        "attack": 0.02,
+        "decay": 0.01,
         "sustain": 0.6,
-        "release": 0.04 })
+        "release": 0.03 })
 
     filt_params = params.copy_with({
         "lowcut": 1000,
@@ -125,20 +125,23 @@ def test_synth_sub():
     buffs1, buffs2 = [], []
     for i in range(32):
         i_params = params.copy_with({
-            "start": i * 0.2,
-            "amplitude": 1 - (i / 32),
-            "frequency": 760 - (i * 10) })
+            "start": 0.02 + i * 0.10,
+            "amplitude": 1 - (i / 64),
+            "frequency": 860 - (i * 2) })
 
         buffs1.append(apply(OscSawtooth(i_params).buff))
 
     for i in range(32):
         i_params = params.copy_with({
-            "start": i * 0.2,
-            "amplitude": 1 - (i / 32),
-            "frequency": 440 + (i * 10) })
+            "start": i * 0.10,
+            "amplitude": 1 - (i / 64),
+            "frequency": 220 + (i * i * 2) })
 
         buffs2.append(apply(OscSawtooth(i_params).buff))
 
-    finalbuff = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
-
+    finalbuff1 = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
+    finalbuff2 = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
+    finalbuff2.start = finalbuff1.duration
+    finalbuff = Mixer({"amplitude": 1}).mix(finalbuff1, finalbuff2)
+    
     player.write(finalbuff)
