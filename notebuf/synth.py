@@ -1,7 +1,7 @@
 import numpy as np
 
 from .param import _Param
-from .mixer import Mixer
+from .mixer import MonoMixer
 
 
 class SynHarmonic(_Param):
@@ -17,15 +17,16 @@ class SynHarmonic(_Param):
             if volume == 0:
                 continue
                 
-            harm_params = params.copy()
-            harm_params["frequency"] = freq
-            harm_params["start"] = 0
+            harm_params = params.copy_with({
+                "frequency": freq,
+                "start": 0
+            })
             harmonics.append(self.oscillator(harm_params).buff.apply(lambda x: x * volume))
             freq += self.frequency
             if freq > self.sample_rate / 2:
                 break
 
-        self.buff = Mixer(params).mix(*harmonics)
+        self.buff = MonoMixer(params).mix(*harmonics)
         self.buff.start = self.start
 
     def _set_opt_param_vals(self, params):

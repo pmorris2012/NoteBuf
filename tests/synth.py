@@ -4,7 +4,7 @@ import numpy as np
 from notebuf.oscillator import OscSine, OscSquare, OscSawtooth, OscTriangle
 from notebuf.envelope import EnvExponential
 from notebuf.synth import SynHarmonic
-from notebuf.mixer import Mixer
+from notebuf.mixer import MonoMixer, StereoMixer
 from notebuf.player import Player
 from notebuf.filter import LowPass, HighPass, BandPass, BandStop
 from notebuf.param import ParamGroup
@@ -97,17 +97,17 @@ def test_synth_2():
 
 def test_synth_sub():
     params = ParamGroup({
-        "duration": .18,
+        "duration": .08,
         "sample_rate": 44100 })
     
     player = Player(params)
 
     env_params = params.copy_with({
         "amplitude": 0.7,
-        "attack": 0.06,
-        "decay": 0.02,
+        "attack": 0.02,
+        "decay": 0.01,
         "sustain": 0.6,
-        "release": 0.04 })
+        "release": 0.03 })
 
     filt_params = params.copy_with({
         "lowcut": 1000,
@@ -115,6 +115,8 @@ def test_synth_sub():
 
     filt_params2 = params.copy_with({
         "highcut": 3000 })
+
+    mix_params = ParamGroup({"amplitude": 1})
 
     def apply(buff):
         BandStop(filt_params).apply(buff)
@@ -125,20 +127,30 @@ def test_synth_sub():
     buffs1, buffs2 = [], []
     for i in range(32):
         i_params = params.copy_with({
-            "start": i * 0.2,
-            "amplitude": 1 - (i / 32),
-            "frequency": 760 - (i * 10) })
+            "start": 0.02 + i * 0.10,
+            "amplitude": 1 - (i / 64),
+            "frequency": 860 - (i * 2),
+            "pan": 0.2 })
 
         buffs1.append(apply(OscSawtooth(i_params).buff))
 
     for i in range(32):
         i_params = params.copy_with({
-            "start": i * 0.2,
-            "amplitude": 1 - (i / 32),
-            "frequency": 440 + (i * 10) })
+            "start": i * 0.10,
+            "amplitude": 1 - (i / 64),
+            "frequency": 220 + (i * i * 2),
+            "pan": 0.8 })
 
         buffs2.append(apply(OscSawtooth(i_params).buff))
 
-    finalbuff = Mixer({"amplitude": 1}).mix(*buffs1, *buffs2)
+    sm = StereoMixer(mix_params)
+    mm = MonoMixer(mix_params.copy_with({"pan": 0.7}))
 
-    player.write(finalbuff)
+    lbuff, rbuff = sm.mix(*buffs1, *buffs2)
+    lbuff2, rbuff2 = sm.mix(mm.mix(lbuff, rbuff))
+
+    player.write(lbuff, rbuff)
+    player.wait()
+
+    player.write(lbuff2, rbuff2)
+    player.wait()
