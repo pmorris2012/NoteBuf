@@ -55,7 +55,10 @@ class StereoMixer(_Param):
         scale = 1
         if not self.amplitude == None:
             max_sample = max(np.max(np.abs(lbuff.buff)), np.max(np.abs(rbuff.buff)))
-            scale = self.amplitude / max_sample
+            
+            if max_sample != 0:
+                scale = self.amplitude / max_sample
+                
         return scale
 
     def scale(self, x, factor):

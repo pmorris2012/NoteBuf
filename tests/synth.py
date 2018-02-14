@@ -32,13 +32,19 @@ def test_synth_sub():
 
     mix_params = ParamGroup({"amplitude": 0.7})
 
+    def apply(buff):
+        BandStop(filt_params).apply(buff)
+        LowPass(filt_params2).apply(buff)
+        EnvExponential(env_params).apply(buff)
+        return buff
+
     beat_params = params.copy_with({
         "duration": .07,
-        "amplitude": 1,
+        "amplitude": 0.8,
         "frequency": 30 })
 
     beat_env_params = beat_params.copy_with({
-        "amplitude": 1,
+        "amplitude": 0.8,
         "attack": 0,
         "decay": 0.03,
         "sustain": 0.1,
@@ -52,21 +58,46 @@ def test_synth_sub():
         "lowcut": 1200,
         "highcut": 10000 })
 
-    def apply(buff):
-        BandStop(filt_params).apply(buff)
-        LowPass(filt_params2).apply(buff)
-        EnvExponential(env_params).apply(buff)
-        return buff
-
     def beat_apply(buff):
         BandStop(beat_filt_params).apply(buff)
         BandStop(beat_filt_params2).apply(buff)
         EnvExponential(beat_env_params).apply(buff)
         return buff
 
-    beats = [beat_apply(OscSquare(beat_params).buff)]
+    beat_params2 = beat_params.copy_with({
+        "start": 0.20,
+        "duration": 0.2,
+        "frequency": 30 })
+
+    beat_env_params2 = beat_params2.copy_with({
+        "amplitude": .4,
+        "attack": 0.01,
+        "decay": 0.03,
+        "sustain": 0.24,
+        "release": 0.01 })
+
+    beat2_filt_params = beat_params.copy_with({
+        "lowcut": 100,
+        "highcut": 8000 })
+
+    beat2_filt_params2 = beat_params.copy_with({
+        "highcut": 8000 })
+
+    def beat_apply2(buff):
+        BandStop(beat2_filt_params).apply(buff)
+        LowPass(beat2_filt_params2).apply(buff)
+        EnvExponential(beat_env_params2).apply(buff)
+        return buff
+
+    beats = [
+        beat_apply(OscSquare(beat_params).buff),
+        beat_apply2(OscSquare(beat_params2).buff),
+        beat_apply2(OscSawtooth(beat_params2).buff)
+    ]
     for i in range(1, 8):
-        beats.append(beats[0].copy({"start": i * 0.40}))
+        beats.append(beats[0].copy({"start": i * 0.40}).apply(lambda x: x * (0.8 ** i)))
+        beats.append(beats[1].copy({"start": 0.18 + i * 0.40}))
+        beats.append(beats[2].copy({"start": 0.22 + i * 0.40}))
 
     buffs1, buffs2 = [], []
     for i in range(32):
